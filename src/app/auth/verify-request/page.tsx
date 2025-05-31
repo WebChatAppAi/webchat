@@ -1,14 +1,18 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+// import Link from 'next/link'; // No longer needed
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
+import { BackgroundPaths } from '@/components/ui/background-paths';
+import { ShimmerButton } from '@/components/ui/shimmer-button'; // Import ShimmerButton
 
 export default function VerifyRequestPage() {
   const [countdown, setCountdown] = useState(5);
-  const [hovered, setHovered] = useState(false);
-  const [particlesCount] = useState(Array(15).fill(0));
+  // const [hovered, setHovered] = useState(false); // No longer needed
+  const router = useRouter(); // Initialize router
+  // const [particlesCount] = useState(Array(15).fill(0)); // Removed particle state
   
   // Optional countdown functionality - still commented out but improved
   // useEffect(() => {
@@ -18,54 +22,20 @@ export default function VerifyRequestPage() {
   // }, [countdown]);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-50 bg-gray-950 overflow-hidden">
-      {/* Animated background particles */}
-      {particlesCount.map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20"
-          initial={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            scale: Math.random() * 0.5 + 0.5,
-            opacity: 0
-          }}
-          animate={{
-            x: [
-              Math.random() * window.innerWidth,
-              Math.random() * window.innerWidth,
-              Math.random() * window.innerWidth
-            ],
-            y: [
-              Math.random() * window.innerHeight,
-              Math.random() * window.innerHeight,
-              Math.random() * window.innerHeight
-            ],
-            opacity: [0, 0.4, 0],
-            scale: [0, Math.random() * 1 + 1, 0]
-          }}
-          transition={{
-            duration: Math.random() * 20 + 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          style={{
-            width: `${Math.random() * 200 + 50}px`,
-            height: `${Math.random() * 200 + 50}px`,
-            filter: "blur(40px)"
-          }}
-        />
-      ))}
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-white dark:bg-neutral-950">
+      <div className="absolute inset-0 z-0"> {/* Ensure BackgroundPaths is behind content */}
+        <BackgroundPaths title="" />
+      </div>
 
-      {/* Main content */}
+      {/* Main content card */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 20 }} // Start from slightly below
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', damping: 15, stiffness: 200, delay: 0.1 }}
-        className="w-full max-w-lg p-8 sm:p-12 rounded-2xl relative z-10
-                  bg-gradient-to-br from-gray-800/80 via-gray-850/80 to-gray-900/80 
-                  backdrop-blur-lg border border-gray-700/50 text-center
-                  shadow-[0_0_50px_rgba(56,189,248,0.15)]"
+        transition={{ type: 'spring', damping: 15, stiffness: 100, delay: 0.2 }} // Adjusted delay and stiffness
+        className="w-full max-w-md p-8 sm:p-10 rounded-2xl relative z-10
+                  bg-neutral-950/70 dark:bg-neutral-950/70  /* Darker, more translucent background */
+                  backdrop-blur-xl border border-neutral-700/60 text-center
+                  shadow-2xl shadow-blue-500/10 dark:shadow-blue-400/10" // More subtle shadow
       >
         {/* Animated glow effect */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden">
@@ -134,17 +104,10 @@ export default function VerifyRequestPage() {
           />
         </motion.div>
         
-        <motion.h2 
-          className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-4 text-shadow"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-        >
-          Check Your Inbox
-        </motion.h2>
+        {/* Title is handled by BackgroundPaths component, this h2 is no longer needed */}
         
         <motion.div
-          className="space-y-3 mb-10"
+          className="space-y-3 mb-10" /* Removed mt-8 as the h2 is now fully removed */
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.4 }}
@@ -171,35 +134,32 @@ export default function VerifyRequestPage() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.6, type: 'spring', stiffness: 150 }}
-          whileHover={{ scale: 1.05 }}
+          className="mt-10" // Added margin top for spacing
         >
-          <Link href="/"
-            className="relative inline-flex group"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
+          <ShimmerButton
+            onClick={() => router.push('/')}
+            shimmerColor="rgba(255, 255, 255, 0.4)"
+            shimmerSize="0.1em"
+            shimmerDuration="2.5s"
+            borderRadius="1.15rem"
+            background="rgba(0, 0, 0, 0.8)" // Match landing page button background
+            className="px-8 py-3 text-lg font-semibold backdrop-blur-md"
           >
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur-md opacity-50 group-hover:opacity-80 transition duration-500"></div>
-            <div className="relative px-10 py-3.5 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white font-semibold text-lg tracking-wide transition-all duration-300">
+            <span className="text-white opacity-100 group-hover:opacity-100 transition-opacity text-shadow">
               Back to Home
-              <motion.span
-                className="absolute inset-0 rounded-xl"
-                initial={false}
-                animate={hovered ? {
-                  boxShadow: [
-                    "0 0 0px 0px rgba(59, 130, 246, 0)",
-                    "0 0 20px 5px rgba(59, 130, 246, 0.5)",
-                    "0 0 0px 0px rgba(59, 130, 246, 0)"
-                  ]
-                } : { boxShadow: "0 0 0px 0px rgba(59, 130, 246, 0)" }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-            </div>
-          </Link>
+            </span>
+            <span
+              className="ml-3 text-white opacity-90 group-hover:opacity-100 group-hover:translate-x-1.5 
+                      transition-all duration-300"
+            >
+              →
+            </span>
+          </ShimmerButton>
         </motion.div>
         
         {/* Email validity info */}
         <motion.div 
-          className="mt-12 px-6 py-4 rounded-xl bg-gray-900/30 border border-gray-800/50"
+          className="mt-12 px-6 py-4 rounded-xl bg-neutral-900/50 dark:bg-neutral-900/50 border border-neutral-800/60" /* Adjusted background and border */
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.4 }}

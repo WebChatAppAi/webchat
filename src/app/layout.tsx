@@ -24,9 +24,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark">
       {/* The <head> is managed by Next.js based on metadata object */}
-      <body className="bg-gray-900">
+      <body className="bg-background text-foreground">
         {/* AppProviders will contain all the client-side logic and providers */}
         <AppProviders>
           {children}
