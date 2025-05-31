@@ -29,8 +29,8 @@ A modern real-time web chat application built with Next.js, Prisma, and NextAuth
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/webchat-OLD.git
-   cd webchat-OLD
+   git clone https://github.com/WebChatAppAi/webchat.git
+   cd webchat
    ```
 
 2. Install dependencies
@@ -79,7 +79,7 @@ A modern real-time web chat application built with Next.js, Prisma, and NextAuth
 ## 📋 Project Structure
 
 ```
-webchat-OLD/
+webchat/
 ├── prisma/            # Prisma schema and migrations
 ├── public/            # Static assets
 ├── src/               # Next.js application code
@@ -91,41 +91,6 @@ webchat-OLD/
 ├── next.config.ts     # Next.js configuration
 └── README.md          # This file
 ```
-
-## 🚀 Pushing to GitHub
-
-To push your project to GitHub, follow these steps:
-
-1. **Initialize git** (if not already done):
-   ```bash
-   git init
-   ```
-
-2. **Add all files to staging**:
-   ```bash
-   git add .
-   ```
-
-3. **Commit your changes**:
-   ```bash
-   git commit -m "Initial commit"
-   ```
-
-4. **Create a new repository on GitHub**:
-   - Go to https://github.com/new
-   - Name your repository (e.g., webchat-OLD)
-   - Do not initialize with README, .gitignore, or license files
-
-5. **Link your local repository to GitHub**:
-   ```bash
-   git remote add origin https://github.com/yourusername/webchat-OLD.git
-   ```
-
-6. **Push your code**:
-   ```bash
-   git push -u origin main
-   ```
-   (Use `master` instead of `main` if that's your default branch)
 
 ## 🤝 Contributing
 
