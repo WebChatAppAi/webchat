@@ -417,3 +417,79 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* AI Icon Shimmer Effect */
+@keyframes shimmer-border {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-icon-shimmer {
+  position: relative;
+  overflow: hidden; /* Important to contain the pseudo-element */
+}
+
+.ai-icon-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    transparent,
+    transparent,
+    transparent,
+    rgba(255, 255, 255, 0.7), /* White light streak */
+    transparent,
+    transparent
+  );
+  animation: shimmer-border 2s linear infinite;
+  z-index: 0; /* Ensure it's behind the icon content but visible */
+}
+
+/* Ensure the icon itself is above the shimmer */
+.ai-icon-shimmer > svg {
+  position: relative;
+  z-index: 1;
+}
+
+/* Toast Shimmer Effect */
+.toast-shimmer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem; /* Match toast rounded-xl */
+}
+
+.toast-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -100%; /* Adjust for rectangular shape */
+  left: -100%;
+  width: 300%; /* Adjust for rectangular shape */
+  height: 300%;
+  background: conic-gradient(
+    transparent,
+    transparent,
+    transparent,
+    rgba(255, 255, 255, 0.15), /* Softer white light streak for toast */
+    transparent,
+    transparent,
+    transparent,
+    rgba(255, 255, 255, 0.15), /* Another streak for better coverage */
+    transparent,
+    transparent
+  );
+  animation: shimmer-border 3s linear infinite; /* Can use same animation, maybe slower */
+  z-index: 0;
+}
+
+/* Ensure toast content is above the shimmer */
+.toast-shimmer > div { /* Assuming direct children are content wrappers */
+  position: relative;
+  z-index: 1;
+}

@@ -11,7 +11,8 @@ interface ProfileModalProps {
   onClose: () => void;
   username: string;
   profilePicture: string | null;
-  onUpdateProfile: (username: string, profilePicture: string | null) => void;
+  bio: string | null; // Added bio to props
+  onUpdateProfile: (username: string, profilePicture: string | null, bio: string | null) => void; // Updated signature
 }
 
 export default function ProfileModal({
@@ -19,10 +20,12 @@ export default function ProfileModal({
   onClose,
   username,
   profilePicture,
+  bio, // Added bio
   onUpdateProfile,
 }: ProfileModalProps) {
   const [newUsername, setNewUsername] = useState(username);
   const [newProfilePicture, setNewProfilePicture] = useState<string | null>(profilePicture);
+  const [newBio, setNewBio] = useState<string | null>(bio); // Added state for bio
   const [previewUrl, setPreviewUrl] = useState<string | null>(profilePicture);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,10 +46,11 @@ export default function ProfileModal({
     if (isOpen) {
       setNewUsername(username);
       setNewProfilePicture(profilePicture);
+      setNewBio(bio); // Reset bio
       setPreviewUrl(profilePicture);
       setError(null);
     }
-  }, [isOpen, username, profilePicture]);
+  }, [isOpen, username, profilePicture, bio]); // Added bio to dependencies
 
   // Close modal when clicking outside
   useEffect(() => {
@@ -120,7 +124,7 @@ export default function ProfileModal({
     // In a real app, you would upload the image to a server here
     // For this demo, we'll just simulate a delay
     setTimeout(() => {
-      onUpdateProfile(newUsername, newProfilePicture);
+      onUpdateProfile(newUsername, newProfilePicture, newBio); // Pass newBio
       setIsUploading(false);
       onClose();
     }, 500);
@@ -128,11 +132,9 @@ export default function ProfileModal({
 
   // Handle logout
   const handleLogout = async () => {
-    const success = await logoutUser();
-    if (success) {
-      router.push('/');
-      onClose();
-    }
+    await logoutUser(); // Assume logoutUser handles navigation or errors internally
+    router.push('/'); // Or navigation might be handled by logoutUser itself
+    onClose();
   };
 
   if (!isOpen || !mounted) return null;
@@ -211,6 +213,19 @@ export default function ProfileModal({
               onChange={(e) => setNewUsername(e.target.value)}
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
               placeholder="Enter your username"
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-400 mb-1">
+              Bio
+            </label>
+            <textarea
+              value={newBio || ''}
+              onChange={(e) => setNewBio(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white resize-none custom-scrollbar"
+              placeholder="Tell us a little about yourself..."
             />
           </div>
           

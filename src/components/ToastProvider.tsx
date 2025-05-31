@@ -1,50 +1,36 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-import Toast, { ToastType } from './Toast';
+import { useState, ReactNode, useCallback } from 'react'; // Removed createContext, useContext
+import Toast from './Toast'; // Kept ToastType via Toast import
 import { AnimatePresence } from 'framer-motion';
+import { ToastContext, ToastMessage as ToastItemType, ToastType } from '@/hooks/useToast'; // Import new context and types
 
-interface ToastItem {
-  id: string;
-  message: string;
-  type: ToastType;
-}
-
-interface ToastContextType {
-  showToast: (message: string, type: ToastType) => void;
-}
-
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
-
-export function useToast() {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
-}
+// Interface ToastItem removed as ToastItemType from hook will be used.
+// Interface ToastContextType removed as it's defined in the hook.
+// const ToastContext removed as it's imported.
+// export function useToast() removed as it's imported from the hook.
 
 interface ToastProviderProps {
   children: ReactNode;
 }
 
 export default function ToastProvider({ children }: ToastProviderProps) {
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const [toasts, setToasts] = useState<ToastItemType[]>([]); // Use ToastItemType
   
-  const showToast = (message: string, type: ToastType) => {
-    const id = Date.now().toString();
-    setToasts((prev) => [...prev, { id, message, type }]);
+  const addToast = useCallback((message: string, type: ToastType, duration: number = 5000) => {
+    const id = crypto.randomUUID(); // Use crypto.randomUUID for better ID generation
+    setToasts((prev) => [...prev, { id, message, type, duration }]);
     
-    // Auto-remove toast after 5 seconds
+    // Auto-remove toast after specified duration
     setTimeout(() => {
       removeToast(id);
-    }, 5000);
-  };
+    }, duration);
+  }, []); // Added useCallback and dependencies
   
-  const removeToast = (id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  };
+  }, []); // Added useCallback
   
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={{ addToast, removeToast }}> {/* Provide addToast and removeToast */}
       {children}
       
       {/* Toast container positioned at the top center */}

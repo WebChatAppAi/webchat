@@ -6,10 +6,10 @@ import Message from './Message';
 import ChatInput from './ChatInput';
 import { useConversationStore, Message as MessageType } from '@/store/conversationStore';
 import { useApiConfigStore } from '@/store/apiConfigStore';
-import { useChatHistoryStore } from '@/store/chatHistoryStore';
+import { useChatHistoryStore, ChatItem } from '@/store/chatHistoryStore'; // Added ChatItem
 import { createChatCompletion } from '@/utils/streamingUtils';
 import ApiConfigModal from './ApiConfigModal';
-import { useToast } from '@/components/ToastProvider';
+import { useToast } from '@/hooks/useToast'; // Corrected import path
 
 interface ChatContainerProps {
   chatId?: string;
@@ -30,6 +30,23 @@ export default function ChatContainer({ chatId }: ChatContainerProps) {
   // If chatId is somehow undefined, it's an issue upstream.
   const currentChatId = chatId as string;
   const messages = getMessages(currentChatId);
+
+  const generateChatTitle = (messageContent: string | undefined, currentDefaultTitle: string = "New Conversation"): string => {
+    const maxLength = 50;
+    if (!messageContent || messageContent.trim().length === 0) {
+      return currentDefaultTitle;
+    }
+    const trimmedContent = messageContent.trim();
+    if (trimmedContent.length <= maxLength) {
+      return trimmedContent;
+    }
+    let truncated = trimmedContent.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    if (lastSpace > 0 && lastSpace > maxLength - 20) { // Try to break at a word, but not too short
+      truncated = truncated.slice(0, lastSpace);
+    }
+    return truncated + "...";
+  };
 
   // Set isClient to true on component mount
   useEffect(() => {
@@ -71,21 +88,38 @@ export default function ChatContainer({ chatId }: ChatContainerProps) {
   useEffect(() => {
     if (messages.length > 0 && getChatById(currentChatId)) { // Only update if chat exists
       const lastMessage = messages[messages.length - 1];
-      // Generate title from the first user message if possible, or keep existing if more robust title logic is added later
-      const firstUserMessage = messages.find(m => m.isUser);
-      const chatTitle = firstUserMessage?.content.slice(0, 30) + '...' || getChatById(currentChatId)?.title || 'Chat';
-      
-      updateChat(currentChatId, {
-        title: chatTitle,
-        lastMessageTime: lastMessage.timestamp,
-      });
+      const existingChat = getChatById(currentChatId);
+
+      if (existingChat) {
+        // Only update title if it's still a generic one or very short
+        const genericTitles = ["New Chat", "Chat", "New Conversation"];
+        const isGenericTitle = genericTitles.includes(existingChat.title) || existingChat.title.length < 5;
+
+        if (isGenericTitle) {
+          const firstUserMessage = messages.find(m => m.isUser);
+          const newTitle = generateChatTitle(firstUserMessage?.content, existingChat.title);
+          if (newTitle !== existingChat.title) {
+            updateChat(currentChatId, {
+              title: newTitle,
+              lastMessageTime: lastMessage.timestamp,
+            });
+          } else {
+            // Just update timestamp if title hasn't changed meaningfully
+             updateChat(currentChatId, { lastMessageTime: lastMessage.timestamp });
+          }
+        } else {
+          // If title is user-set or already good, just update timestamp
+          updateChat(currentChatId, { lastMessageTime: lastMessage.timestamp });
+        }
+      }
     }
-  }, [messages, currentChatId, updateChat, getChatById]);
+  }, [messages, currentChatId, updateChat, getChatById]); // Removed getChatById from here as it's used inside
 
   const handleSendMessage = async (content: string) => {
-    if (!content.trim() || isLoading || !currentChatId) return; // Ensure currentChatId is valid
+    if (!content.trim() || isLoading || !currentChatId) return;
 
-    const isFirstMessage = getMessages(currentChatId).length === 0;
+    const currentMessages = getMessages(currentChatId); // Get current messages for the chat
+    const isFirstMessageInChat = currentMessages.length === 0;
 
     // Add user message
     const userMessage: MessageType = {
@@ -97,14 +131,22 @@ export default function ChatContainer({ chatId }: ChatContainerProps) {
     
     addMessage(currentChatId, userMessage);
 
-    // If it's the first message of this chat, add it to chat history
-    if (isFirstMessage) {
-      const chatTitle = content.slice(0, 30) + '...' || 'New Chat';
-      addChat({
-        id: currentChatId, // This is the UUID from the URL
-        title: chatTitle,
+    // If it's the first message of this chat (i.e., chat doesn't exist in history yet)
+    // OR if the chat exists but has no messages (e.g. navigated to an empty new chat URL)
+    const chatInHistory = getChatById(currentChatId);
+    if (!chatInHistory || isFirstMessageInChat) {
+      const newTitle = generateChatTitle(content, "New Conversation");
+      const chatData: ChatItem = {
+        id: currentChatId,
+        title: newTitle,
         lastMessageTime: userMessage.timestamp,
-      });
+      };
+      if (!chatInHistory) {
+        addChat(chatData);
+      } else {
+        // If chat exists but this is the first message, update its title and timestamp
+        updateChat(currentChatId, { title: newTitle, lastMessageTime: userMessage.timestamp });
+      }
     }
     
     // Check if API is configured

@@ -14,6 +14,7 @@ interface ChatHistoryState {
   deleteChat: (id: string) => void;
   getChatById: (id: string) => ChatItem | undefined;
   getGroupedChats: () => Record<string, ChatItem[]>;
+  clearAllChats: () => void; // Added clearAllChats
 }
 
 export const useChatHistoryStore = create<ChatHistoryState>()(
@@ -72,10 +73,12 @@ export const useChatHistoryStore = create<ChatHistoryState>()(
           groups[group].push(chat);
           return groups;
         }, {});
-      }
+      },
+
+      clearAllChats: () => set({ chats: [] }), // Implement clearAllChats
     }),
     {
       name: 'chat-history-storage',
     }
   )
-); 
+);

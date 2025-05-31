@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApiConfigStore } from '@/store/apiConfigStore';
-import { useToast } from './ToastProvider';
+import { useToast } from '@/hooks/useToast'; // Corrected import path
 
 interface ApiConfigModalProps {
   isOpen: boolean;

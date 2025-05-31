@@ -9,6 +9,7 @@ import { useChatHistoryStore, ChatItem } from '@/store/chatHistoryStore';
 import { useConversationStore } from '@/store/conversationStore';
 import { useUserProfileStore } from '@/store/userProfileStore';
 import ProfileModal from './ProfileModal';
+import SettingsModal from './SettingsModal'; // Import SettingsModal
 import Image from 'next/image';
 
 type GroupedChats = {
@@ -18,11 +19,12 @@ type GroupedChats = {
 export default function Sidebar() {
   const { getGroupedChats, updateChat, deleteChat } = useChatHistoryStore();
   const { clearConversation } = useConversationStore();
-  const { username, profilePicture, updateProfile } = useUserProfileStore();
+  const { username, profilePicture, bio, updateProfile } = useUserProfileStore(); // Added bio
   const [isLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeChatOptions, setActiveChatOptions] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false); // State for SettingsModal
   const [isClient, setIsClient] = useState(false);
   const chatOptionsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -96,8 +98,9 @@ export default function Sidebar() {
   };
 
   // Handle profile update
-  const handleUpdateProfile = (newUsername: string, newProfilePicture: string | null) => {
-    updateProfile(newUsername, newProfilePicture);
+  const handleUpdateProfile = (newUsername: string, newProfilePicture: string | null /*, newBio: string | null */) => {
+    // Assuming ProfileModal won't directly edit bio for now, pass existing bio
+    updateProfile(newUsername, newProfilePicture, bio);
   };
 
   // Get grouped chats
@@ -254,37 +257,22 @@ export default function Sidebar() {
               </svg>
             )}
           </div>
-          <div className="font-medium">{username || 'User'}</div>
+          <div className="font-medium text-white">{username || 'User'}</div>
         </div>
 
-        <Link
-          href="/profile"
-          className={`flex items-center p-2.5 rounded-xl cursor-pointer hover:bg-[#252525] transition-colors duration-150 mt-1 ${
-            pathname === '/profile' ? 'bg-[#252525]' : ''
-          }`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mr-3">
-            {/* Using a generic settings/user icon for profile for consistency if needed, or keep specific one */}
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
-            {/* Original icon path for reference: <path d="M12.22 2h-4.44a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4.44M18.53 5.47a2.121 2.121 0 0 1 3 3L14.06 16H12v-2.06l6.53-6.53Z"></path> */}
-            {/* Removed other paths for brevity, assuming the user icon is preferred for "Profile" */}
-          </svg>
-          <span className="font-medium">Profile</span>
-        </Link>
+        {/* Profile link removed as per request, ProfileModal is triggered by clicking user avatar/name above */}
 
-        <Link
-          href="/settings"
-          className={`flex items-center p-2.5 rounded-xl cursor-pointer hover:bg-[#252525] transition-colors duration-150 mt-1 ${
-            pathname === '/settings' ? 'bg-[#252525]' : ''
+        <button
+          onClick={() => setShowSettingsModal(true)}
+          className={`w-full flex items-center p-2.5 rounded-xl cursor-pointer hover:bg-[#252525] transition-colors duration-150 mt-1 ${
+             showSettingsModal || pathname === '/settings' ? 'bg-[#252525]' : '' // Keep active style if modal is open or (legacy) path matches
           }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mr-3">
-            {/* Using a generic settings cog icon */}
             <path d="M12.22 2h-4.44a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11.5M16 2v4h4m-3.586 5.414a2 2 0 1 1 2.828 2.828L18 16l-2.828-2.828a2 2 0 0 1 0-2.828L18 8l2.172 2.172a2 2 0 0 1 0 2.828L20 14l-1.172 1.172"></path><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V12a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            {/* Original icon path: <path d="M12.22 2h-4.44a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11.5M16 2v4h4M10.42 12.61a2.121 2.121 0 1 1 2.97 2.97L7.5 22H4s0-3.5 0-3.5L10.42 12.61z"></path><path d="m18 5 4 4"></path> */}
           </svg>
-          <span className="font-medium">Settings</span>
-        </Link>
+          <span className="font-medium text-white">Settings</span>
+        </button>
 
         {/* Logout Button can be added here if needed */}
         {/* For example:
@@ -305,8 +293,14 @@ export default function Sidebar() {
         onClose={() => setShowProfileModal(false)}
         username={username || 'User'}
         profilePicture={profilePicture}
+        bio={bio}
         onUpdateProfile={handleUpdateProfile}
+      />
+
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
       />
     </div>
   );
-} 
+}

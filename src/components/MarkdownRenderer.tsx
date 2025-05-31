@@ -61,7 +61,7 @@ function LanguageIndicator({ language }: { language: string }) {
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <div className="prose dark:prose-invert max-w-none break-words markdown-code-scrollbar">
+    <div className="prose dark:prose-invert max-w-none break-words markdown-code-scrollbar prose-p:leading-normal prose-li:leading-normal">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]} // Enables GFM features: tables, strikethrough, task lists, etc.
         rehypePlugins={[rehypeRaw, rehypeKatex]} // rehypeRaw allows HTML in markdown; rehypeKatex enables math rendering.

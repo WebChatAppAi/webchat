@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "node_modules\\.bin\\prisma.CMD generate"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -19,13 +19,15 @@
     "framer-motion": "^12.4.7",
     "katex": "^0.16.21",
     "lucide-react": "^0.510.0",
-    "magic-sdk": "^28.21.1",
+    "magic-sdk": "^29.0.0",
+    "next": "15.1.1",
     "mermaid": "^11.4.1",
     "moji": "^0.5.1",
     "motion": "^12.11.4",
     "next": "15.1.7",
     "next-auth": "^4.24.11",
     "nodemailer": "^7.0.3",
+    "pdf-parse": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
@@ -57,5 +59,5 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
-  "packageManager": "yarn@4.9.1+sha512.f95ce356460e05be48d66401c1ae64ef84d163dd689964962c6888a9810865e39097a5e9de748876c2e0bf89b232d583c33982773e9903ae7a76257270986538"
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }
